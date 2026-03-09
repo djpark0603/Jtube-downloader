@@ -3,42 +3,46 @@ document.addEventListener('DOMContentLoaded', () => {
   const downloadBtn = document.getElementById('download-btn');
   const statusMsg = document.getElementById('status');
   
-  // Modal Elements
   const modalOverlay = document.getElementById('modal-overlay');
   const modalCloseBtn = document.getElementById('modal-close-btn');
   const modalThumbnail = document.getElementById('modal-thumbnail');
   const modalTitle = document.getElementById('modal-title');
   const modalDownloadList = document.getElementById('modal-download-list');
 
-  const mockData = {
-    title: "Awesome YouTube Video Content - 4K Visual Experience",
-    thumbnail: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&q=80&w=1000",
-    options: [
-      { quality: "1080p", details: "60fps - 150MB", ext: "MP4" },
-      { quality: "720p", details: "30fps - 80MB", ext: "MP4" },
-      { quality: "480p", details: "30fps - 45MB", ext: "MP4" },
-      { quality: "MP3", details: "320kbps - 12MB", ext: "Audio" }
-    ]
-  };
+  // 다중 인스턴스 설정 (하나가 안 되면 다른 곳 시도)
+  const API_INSTANCES = [
+    "https://pipedapi.kavin.rocks",
+    "https://api.piped.victr.me",
+    "https://piped-api.garudalinux.org"
+  ];
 
-  const isValidYoutubeUrl = (url) => {
-    const pattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
-    return pattern.test(url);
+  const extractVideoId = (url) => {
+    if (!url) return null;
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
   };
 
   const showModal = (data) => {
-    modalThumbnail.src = data.thumbnail;
+    modalThumbnail.src = data.thumbnailUrl || data.thumbnail;
     modalTitle.textContent = data.title;
     
-    modalDownloadList.innerHTML = data.options.map(opt => `
-      <div class="download-item">
-        <div class="item-info">
-          <span class="item-quality">${opt.quality}</span>
-          <span class="item-details">${opt.details}</span>
+    // 오디오와 비디오가 합쳐진 스트림 필터링
+    const streams = data.videoStreams ? data.videoStreams.filter(s => s.videoOnly === false) : [];
+    
+    if (streams.length === 0) {
+      modalDownloadList.innerHTML = '<p class="status-msg visible" style="color: #ff4444; opacity: 1;">Direct links not available for this video.</p>';
+    } else {
+      modalDownloadList.innerHTML = streams.map(stream => `
+        <div class="download-item">
+          <div class="item-info">
+            <span class="item-quality">${stream.quality}</span>
+            <span class="item-details">${stream.mimeType.split(';')[0].split('/')[1].toUpperCase()} • ${stream.fps}fps</span>
+          </div>
+          <button class="btn-item-download" onclick="window.open('${stream.url}', '_blank')">Download</button>
         </div>
-        <button class="btn-item-download">Download</button>
-      </div>
-    `).join('');
+      `).join('');
+    }
 
     modalOverlay.classList.add('active');
   };
@@ -47,28 +51,54 @@ document.addEventListener('DOMContentLoaded', () => {
     modalOverlay.classList.remove('active');
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const url = urlInput.value.trim();
+    const videoId = extractVideoId(url);
     
     if (!url) {
       showStatus('Please enter a YouTube URL.', 'error');
       return;
     }
 
-    if (!isValidYoutubeUrl(url)) {
-      showStatus('Invalid YouTube URL. Please check again.', 'error');
+    if (!videoId) {
+      showStatus('Could not find a valid Video ID. Please check the URL.', 'error');
       return;
     }
 
-    showStatus('Analyzing video content...', 'loading');
+    showStatus('Analyzing video...', 'loading');
     downloadBtn.disabled = true;
+    const originalBtnText = downloadBtn.innerHTML;
+    downloadBtn.innerHTML = '<span>Analyzing...</span>';
 
-    // Simulate network delay
-    setTimeout(() => {
-      showStatus('', '');
-      downloadBtn.disabled = false;
-      showModal(mockData);
-    }, 1500);
+    let success = false;
+
+    // 여러 인스턴스를 순차적으로 시도
+    for (const apiBase of API_INSTANCES) {
+      try {
+        console.log(`Trying API: ${apiBase} for ID: ${videoId}`);
+        const response = await fetch(`${apiBase}/streams/${videoId}`);
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const data = await response.json();
+        if (data && data.title) {
+          showStatus('', '');
+          showModal(data);
+          success = true;
+          break; // 성공하면 루프 중단
+        }
+      } catch (error) {
+        console.warn(`Failed with ${apiBase}:`, error.message);
+        continue; // 다음 인스턴스 시도
+      }
+    }
+
+    if (!success) {
+      showStatus('Server is busy or video restricted. Please try again later.', 'error');
+    }
+
+    downloadBtn.disabled = false;
+    downloadBtn.innerHTML = originalBtnText;
   };
 
   const showStatus = (text, type) => {
@@ -81,14 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (type === 'error') {
       statusMsg.style.color = '#ff4444';
-    } else if (type === 'success') {
-      statusMsg.style.color = '#44ff44';
     } else {
       statusMsg.style.color = 'var(--text-sub)';
     }
   };
 
-  // Event Listeners
   downloadBtn.addEventListener('click', handleDownload);
   
   urlInput.addEventListener('keypress', (e) => {
@@ -105,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === modalOverlay) closeModal();
   });
 
-  // Handle ESC key to close modal
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
       closeModal();
