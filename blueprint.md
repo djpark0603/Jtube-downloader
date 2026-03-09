@@ -5,23 +5,28 @@ A modern, framework-less web application for extracting and downloading YouTube 
 
 ## Current State
 - Initial project structure with `index.html`, `style.css`, and `main.js`.
-- Basic "Hello World" boilerplate.
+- Base UI for URL input and validation implemented.
+- Git repository connected and pushed.
 
-## Phase 1: Modern UI Implementation
-Goal: Create a clean, sophisticated, and responsive UI for YouTube link input.
+## Phase 2: Results Modal & Mock Data Integration
+Goal: Implement a visually stunning modal to display video information and download options.
 
 ### Design Specifications
-- **Theme:** Dark mode by default with vibrant red accents (YouTube brand).
-- **Typography:** Expressive sans-serif fonts with clear hierarchy (Hero text, sub-headlines).
-- **Layout:** Centered hero section with a focus on the input field.
-- **Visual Effects:** 
-  - Multi-layered drop shadows for depth.
-  - Subtle noise texture for a premium feel.
-  - Interactive "glow" effects for the input and button.
-  - Glassmorphism for the input container.
-- **Responsiveness:** Mobile-first design using Container Queries and Flexbox/Grid.
+- **Modal:** Centered popup with heavy backdrop-blur (glassmorphism).
+- **Thumbnail:** Large, high-quality image preview with rounded corners and a subtle glow.
+- **Download List:** 
+  - List items with quality (e.g., 1080p), FPS, and estimated file size.
+  - Hover states for each row.
+  - Primary action buttons for each download option.
+- **Animations:** Smooth fade-in and scale-up for the modal.
 
 ### Planned Steps
-1. **HTML Structure:** Define a semantic layout with a header, main hero area, and a result preview section (initially hidden).
-2. **Modern CSS:** Implement variables, `:has()` for focus states, and container queries for component-level responsiveness.
-3. **Interactivity:** Add basic JavaScript to handle input focus, validation, and a loading state animation.
+1. **HTML Structure:** Add the modal overlay and container to `index.html`.
+2. **Modern CSS:**
+   - Define modal styling with `backdrop-filter`.
+   - Create a grid/flex layout for the download options list.
+   - Add "open" and "close" animations.
+3. **Interactivity (main.js):**
+   - Update `handleDownload` to simulate a "fetch" and then open the modal.
+   - Inject mock video data (title, thumbnail, options) into the modal.
+   - Implement close functionality (close button and clicking outside).
