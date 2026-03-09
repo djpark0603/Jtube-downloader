@@ -260,38 +260,55 @@ input[type="text"]::placeholder {
 .download-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  max-height: 320px; /* 최대 5-6개 높이 */
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-top: 10px;
+}
+
+/* 스크롤바 커스텀 */
+.download-list::-webkit-scrollbar {
+  width: 5px;
+}
+.download-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+.download-list::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 10px;
 }
 
 .download-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--glass-border);
-  border-radius: 14px;
+  border-radius: 12px;
   transition: var(--transition);
 }
 
 .download-item:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(3px);
 }
 
 .item-info {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 12px;
 }
 
-.item-quality {
-  font-weight: 700;
-  font-size: 1rem;
+.item-main-text {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #fff;
 }
 
-.item-details {
+.item-sub-text {
   font-size: 0.8rem;
   color: var(--text-sub);
 }
@@ -300,12 +317,13 @@ input[type="text"]::placeholder {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
   border: none;
-  padding: 8px 16px;
+  padding: 6px 14px;
   border-radius: 8px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
+  white-space: nowrap;
 }
 
 .btn-item-download:hover {
