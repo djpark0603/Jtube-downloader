@@ -1,1 +1,173 @@
-/* Add styles here */
+:root {
+  --primary: #ff0000;
+  --primary-glow: rgba(255, 0, 0, 0.4);
+  --bg-dark: #0f0f0f;
+  --bg-card: rgba(30, 30, 30, 0.6);
+  --text-main: #ffffff;
+  --text-sub: #aaaaaa;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --shadow-deep: 0 20px 40px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px var(--primary-glow);
+  --radius-lg: 16px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Subtle Noise Texture */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.container {
+  max-width: 800px;
+  width: 90%;
+  z-index: 2;
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* Typography */
+.hero-title {
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -2px;
+  margin-bottom: 16px;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #fff 0%, #888 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  color: var(--text-sub);
+  margin-bottom: 48px;
+  font-weight: 400;
+}
+
+/* Input Section */
+.input-group {
+  position: relative;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+  box-shadow: var(--shadow-deep);
+  transition: var(--transition);
+}
+
+.input-group:focus-within {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-deep), var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+input[type="text"] {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 16px 24px;
+  color: #fff;
+  font-size: 1.1rem;
+  outline: none;
+}
+
+input[type="text"]::placeholder {
+  color: #555;
+}
+
+.btn-download {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0 32px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-download:hover {
+  background: #ff3333;
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+}
+
+.btn-download:active {
+  transform: scale(0.98);
+}
+
+/* Status Messages */
+.status-msg {
+  margin-top: 24px;
+  font-size: 0.9rem;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.status-msg.visible {
+  opacity: 1;
+}
+
+/* Preview Placeholder */
+.preview-card {
+  margin-top: 40px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: none; /* Initially hidden */
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 600px) {
+  .input-group {
+    flex-direction: column;
+    padding: 16px;
+  }
+  
+  .btn-download {
+    height: 56px;
+    justify-content: center;
+  }
+}
